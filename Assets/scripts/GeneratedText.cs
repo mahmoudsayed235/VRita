@@ -19,9 +19,16 @@ public class GeneratedText : MonoBehaviour
 {
     [HideInInspector]
     public string response = "";
-    string prompt;
-    string[] prompts;
-    public string[] promptsEng;
+    //[HideInInspector]
+    public string prompt;
+
+    public string promptEngInterview;
+    public string promptSwiInterview;
+    public string promptSpInterview;
+
+    public string promptEngOral;
+    public string promptSwiOral;
+    public string promptSpOral;
     string previousPrompt = "";
     public string jobDescription = "";
     string[] talker;
@@ -35,9 +42,38 @@ public class GeneratedText : MonoBehaviour
 
         openAIDomain = "https://api.openai.com/v1/chat/completions";
         talker = talkerEng;
-        prompts = promptsEng;
+        //PlayerPrefs.SetString("Type", "Interview");
+        if (PlayerPrefs.GetString("Type", "Oral") == "Oral")
+        {
+            print("Oral");
+            if (PlayerPrefs.GetString("Lang", "En") == "En")
+            {
+                prompt = promptEngOral;
+            }
+            else if (PlayerPrefs.GetString("Lang", "En") == "Sw")
+            {
+                prompt = promptSwiOral;
+            }
+            else if (PlayerPrefs.GetString("Lang", "En") == "Sp")
+            {
+                prompt = promptSpOral;
+            }
+        }else if (PlayerPrefs.GetString("Type", "Oral") == "Interview")
+        {
+            if (PlayerPrefs.GetString("Lang", "En") == "En")
+            {
+                prompt = promptEngInterview;
+            }
+            else if (PlayerPrefs.GetString("Lang", "En") == "Sw")
+            {
+                prompt = promptSwiInterview;
+            }
+            else if (PlayerPrefs.GetString("Lang", "En") == "Sp")
+            {
+                prompt = promptSpInterview;
+            }
+        }
 
-        prompt = prompts[0];
         updatePrompt();
 
     }
@@ -53,7 +89,6 @@ public class GeneratedText : MonoBehaviour
         string pattern = @"\b_jobDescrition\b";
         //for progression
         //  prompt = prompts[index];
-        prompt = prompts[0];
         if (PlayerPrefs.GetString("jobTitle") != "")
         {
             prompt = Regex.Replace(prompt, pattern, PlayerPrefs.GetString("jobTitle"));
@@ -71,7 +106,7 @@ public class GeneratedText : MonoBehaviour
         string promptInput = "";
 
 
-        promptInput = prompt + $"\n\n{talker[1]} {playerInput} \n{talker[0]}";
+        promptInput = prompt + $"\n\n user: {playerInput} \n system: ";
         print($"prompt input: {promptInput}");
 
         if (generate)
@@ -89,8 +124,9 @@ public class GeneratedText : MonoBehaviour
 
             openAIdata.messages = messages.ToArray();
             openAIdata.max_tokens = 150;
-            print(PlayerPrefs.GetString("UserId"));
-            openAIdata.user = PlayerPrefs.GetString("UserId");
+
+            
+            openAIdata.user = "12AA24124";
             string json = JsonUtility.ToJson(openAIdata);
             //https://api.openai.com/v1/engines/gpt-4/completions for English
             using (UnityWebRequest www = UnityWebRequest.Put(openAIDomain, json))
@@ -117,77 +153,18 @@ public class GeneratedText : MonoBehaviour
                     if (openAIresponse.choices.Length > 0)
                     {
 
+                        
+                        promptInput += $"{openAIresponse.choices[0].message.content} \n";
                         response = openAIresponse.choices[0].message.content;
-
+                        prompt = promptInput;
                         print(response);
-                        // var clean_response = Regex.Replace(response, @"\t|\n|\r", "");
-                        // eyeController.randomLook();
-                        // var expression_input = $"\n\n Speaker :{playerInput} \n Listener:" +clean_response + " Emotion:";
-                        // expController.react(expression_input);
-
+                       
 
                     }
                 }
 
             }
-            /*
-                        openAiData openAIdataCF = new openAiData();
-                        openAIdataCF.prompt = $"<|endoftext|>[{response}]\n--\nLabel:";
-                        openAIdataCF.model = "content-filter-alpha";
-                        openAIdataCF.max_tokens = 1;
-                        openAIdataCF.temperature=0;
-                        openAIdataCF.top_p=1;
-                        openAIdataCF.logprobs=10;
-
-                        openAIdataCF.user = PlayerPrefs.GetString("UserId");
-                        string jsonCF = JsonUtility.ToJson(openAIdataCF);
-
-
-                    using (UnityWebRequest www = UnityWebRequest.Put("https://api.openai.com/v1/completions", jsonCF))
-                        {
-                            www.method = "POST";
-                            www.SetRequestHeader("Content-Type", "application/json");
-                            www.SetRequestHeader("Authorization", "Bearer " + LoadKeys.OPEN_AI_API_KEY.ToString());
-
-                            var operation = www.SendWebRequest();
-                            while (!operation.isDone)
-                            {
-                                await Task.Yield();
-                            }
-                            if (www.result != UnityWebRequest.Result.Success)
-                            {
-                                Debug.Log(www.error);
-                            }
-                            else
-                            {
-                                openAiResponse openAIresponseCF = JsonUtility.FromJson<openAiResponse>(www.downloadHandler.text);
-
-                                if (openAIresponseCF.choices.Length > 0)
-                                {
-
-                                    string output_label = openAIresponseCF.choices[0].text;
-                                    if (output_label=="2" ){
-
-                                        response =  base_response;
-                                    }
-                                    else
-                                    {
-
-
-                                    var clean_response = Regex.Replace(response, @"\t|\n|\r", "");
-                                    var expression_input = $"\n\n Speaker :{playerInput} \n Listener:" +clean_response + " Emotion:";
-
-                                    }
-
-
-
-                                }
-
-                            }
-                        }
-
-
-                    */
+            
         }
         else
         {
@@ -195,7 +172,6 @@ public class GeneratedText : MonoBehaviour
 
         }
 
-        prompt = promptInput + response;
 
     }
 

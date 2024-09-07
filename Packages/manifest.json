@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.meta.xr.sdk.audio": "68.0.0",
     "com.readyplayerme.core": "https://github.com/readyplayerme/rpm-unity-sdk-core.git",
     "com.unity.animation.rigging": "1.2.1",
     "com.unity.collab-proxy": "2.4.4",

@@ -22,26 +22,70 @@ public class SynthesizeSpeech : MonoBehaviour
     public bool isMan = true;
     public bool isRobot = false;
     private float startTimeOfPlayAudio;
+    string languageCode = "en-US";
+    string languageCodeEn = "en-US";
+    string languageCodeSw = "sv-SE";
+    string languageCodeSp = "es-ES";
+    public string intro;
 
-    string[] intro;
-    public string[] introEng;
+    public string introEngInterview;
+    public string introSwiInterview;
+    public string introSpInterview;
+    public string introEngOral;
+    public string introSwiOral;
+    public string introSpOral;
 
     void Start()
     {
         generatedText = GetComponent<GeneratedText>();
 
-        intro = introEng;
-
-
-        if (isMan)
+        if (PlayerPrefs.GetString("Type", "Oral") == "Oral")
         {
-            voiceGoogle = "en-US-Wavenet-D";
-
+            if (PlayerPrefs.GetString("Lang", "En") == "En")
+            {
+                intro = introEngOral;
+            }
+            else if (PlayerPrefs.GetString("Lang", "En") == "Sw")
+            {
+                intro = introSwiOral;
+            }
+            else if (PlayerPrefs.GetString("Lang", "En") == "Sp")
+            {
+                intro = introSpOral;
+            }
         }
-        else
+        else if (PlayerPrefs.GetString("Type", "Oral") == "Interview")
+        {
+            if (PlayerPrefs.GetString("Lang", "En") == "En")
+            {
+                intro = introEngInterview;
+            }
+            else if (PlayerPrefs.GetString("Lang", "En") == "Sw")
+            {
+                intro = introSwiInterview;
+            }
+            else if (PlayerPrefs.GetString("Lang", "En") == "Sp")
+            {
+                intro = introSpInterview;
+            }
+        }
+
+
+
+        if (PlayerPrefs.GetString("Lang", "En") == "En")
         {
             voiceGoogle = "en-US-Wavenet-C";
-
+            languageCode = languageCodeEn;
+        }
+        else if (PlayerPrefs.GetString("Lang", "En") == "Sw")
+        {
+            voiceGoogle = "sv-SE-Wavenet-A";
+            languageCode = languageCodeSw;
+        }
+        else if (PlayerPrefs.GetString("Lang", "En") == "Sp")
+        {
+            voiceGoogle = "es-ES-Standard-A";
+            languageCode = languageCodeSp;
         }
 
 
@@ -59,7 +103,7 @@ public class SynthesizeSpeech : MonoBehaviour
 
         if (index == 0)
         {
-            s = intro[0];
+            s = intro;
             index++;
         }
         else
@@ -71,12 +115,11 @@ public class SynthesizeSpeech : MonoBehaviour
                 await generatedText.GetText(s, generate, base_response);
 
                 s = generatedText.GetResponse().ToString();
-                print("new text: " + s);
+                
 
             }
         }
         float timeafterchatgpt = Time.time;
-        print("get response: "+ (timeafterchatgpt - timebeforechatgpt));
 
         bool gotAudio = false;
 
@@ -91,7 +134,9 @@ public class SynthesizeSpeech : MonoBehaviour
         //print("start google : " + Time.time);
         AudioConfiguration audioConfig = new AudioConfiguration("MP3", 0, 1);
         InputData input = new InputData(ssml);
-        Voice voi = new Voice("en-US", voiceGoogle);
+        
+
+        Voice voi = new Voice(languageCode, voiceGoogle);
 
         GoogleSpeechBody body = new GoogleSpeechBody(audioConfig, input, voi);
         string requestBody = JsonUtility.ToJson(body);
@@ -110,20 +155,19 @@ public class SynthesizeSpeech : MonoBehaviour
             if (www.result != UnityWebRequest.Result.Success)
             {
                 Debug.Log(www.error);
+                print(www.downloadHandler.text);
             }
 
             else
             {
                 float timeaftertts = Time.time;
-                print("get response from tts: " + (timeaftertts - timeafterchatgpt));
-
+                
                 GoogleSpeechResponse response = JsonUtility.FromJson<GoogleSpeechResponse>(www.downloadHandler.text);
 
                 File.WriteAllBytes(Application.persistentDataPath + "/somefile.mp3", Convert.FromBase64String(response.audioContent));
                 float timeafterttswritefile = Time.time;
 
-                print("get response after write file: " + (timeafterttswritefile - timeaftertts));
-
+                
                 gotAudio = true;
 
 
@@ -160,7 +204,10 @@ public class SynthesizeSpeech : MonoBehaviour
         }
     }
 
-
+    public void StopAudio()
+    {
+        SynthesisAudioSource.Stop();
+    }
 
     IEnumerator finishSpeaking()
     {
@@ -177,5 +224,60 @@ public class SynthesizeSpeech : MonoBehaviour
 
                 }
         }
+    }
+}
+
+[System.Serializable]
+public class GoogleSpeechResponse
+{
+    public string audioContent;
+
+}
+
+[System.Serializable]
+public class GoogleSpeechBody
+{
+    public AudioConfiguration audioConfig;
+    public InputData input;
+    public Voice voice;
+    public GoogleSpeechBody(AudioConfiguration a, InputData i, Voice v)
+    {
+        audioConfig = a;
+        input = i;
+        voice = v;
+    }
+}
+
+[System.Serializable]
+public class AudioConfiguration
+{
+    public string audioEncoding;
+    public int pitch;
+    public int speakingRate;
+    public AudioConfiguration(string encode, int p, int s)
+    {
+        audioEncoding = encode;
+        pitch = p;
+        speakingRate = s;
+    }
+}
+[System.Serializable]
+public class InputData
+{
+    public string ssml;
+    public InputData(string s)
+    {
+        ssml = s;
+    }
+}
+[System.Serializable]
+public class Voice
+{
+    public string languageCode;
+    public string name;
+    public Voice(string l, string n)
+    {
+        languageCode = l;
+        name = n;
     }
 }

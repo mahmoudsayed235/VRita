@@ -56,7 +56,10 @@ public class RecognizeSpeech : MonoBehaviour
     int lastSample = 0;
     int message_length = 0;
     AudioSource audioSource;
-    public string language = "en-US";
+    string language = "en-US";
+    public string languageEn = "en-US";
+    public string languageSw = "sv-SE";
+    public string languageSp = "es-ES";
 
     [HideInInspector]
     public int index = 0;
@@ -180,7 +183,18 @@ public class RecognizeSpeech : MonoBehaviour
     public void configure()
     {
 
-
+        if (PlayerPrefs.GetString("Lang", "En") == "En")
+        {
+            language = languageEn;
+        }
+        else if (PlayerPrefs.GetString("Lang", "En") == "Sw")
+        {
+            language = languageSw;
+        }
+        else if (PlayerPrefs.GetString("Lang", "En") == "Sp")
+        {
+            language = languageSp;
+        }
         {
             // Continue with normal initialization, Text and Button objects are present.
 #if PLATFORM_ANDROID
@@ -203,7 +217,7 @@ public class RecognizeSpeech : MonoBehaviour
             config = SpeechConfig.FromSubscription(LoadKeys.SPEECH_API_KEY, LoadKeys.SPEECH_API_REGION);
 
             //language = "nb-NO";
-            config.SpeechRecognitionLanguage = "en-US";
+            config.SpeechRecognitionLanguage =language;
 
             pushStream = AudioInputStream.CreatePushStream();
             audioInput = AudioConfig.FromStreamInput(pushStream);
@@ -313,10 +327,10 @@ public class RecognizeSpeech : MonoBehaviour
 
             Microphone.End(null);
             lastSample = 0;
-            if (answer != null)
+            /*if (answer != null)
             {
                 answer.text = "";
-            }
+            }*/
         }
 
 
