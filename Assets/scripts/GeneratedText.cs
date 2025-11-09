@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -112,7 +112,7 @@ public class GeneratedText : MonoBehaviour
         if (generate)
         {
             openAiData openAIdata = new openAiData();
-            openAIdata.model = "gpt-4o"; 
+            openAIdata.model = "gpt-4o-mini"; 
 
             Message m = new Message { role = "system", content = prompt };
             messages.Add(m);
@@ -128,7 +128,7 @@ public class GeneratedText : MonoBehaviour
             
             openAIdata.user = "12AA24124";
             string json = JsonUtility.ToJson(openAIdata);
-            //https://api.openai.com/v1/engines/gpt-4/completions for English
+            //https://api.openai.com/v1/chat/completions for English
             using (UnityWebRequest www = UnityWebRequest.Put(openAIDomain, json))
             {
                 www.method = "POST";

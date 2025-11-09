@@ -15,5 +15,5 @@ MonoBehaviour:
   Subdomain: madah
   AppId: 6568a8a632fb5e94647046d8
   EnableLogging: 0
-  EnableAnalytics: 0
+  EnableAnalytics: 1
   BodyType: 1
