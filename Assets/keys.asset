@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: keys
   m_EditorClassIdentifier: 
   SpeechKey: ACuPRMpPJyprh0ifJZw9vdZjx5pMqrGvmaAqqFC4LdllQJT7ipiCJQQJ99BKAC5RqLJXJ3w3AAAYACOGriff
-  GoogleSpeechKey: AIzaSyC8RvuvdpzmMfIaLLxGaT3uMnqn7KEhSnw
+  GoogleSpeechKey: 
   SpeechRegion: westeurope
   openAIKey: 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
