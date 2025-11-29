@@ -54,7 +54,7 @@ public class SynthesizeSpeech : MonoBehaviour
                 intro = introSpOral;
             }
         }
-        else if (PlayerPrefs.GetString("Type", "Oral") == "Interview")
+        else if (PlayerPrefs.GetString("Type", "Oral") == "Interview" || PlayerPrefs.GetString("Type", "Oral") == "Digitopia")
         {
             if (PlayerPrefs.GetString("Lang", "En") == "En")
             {
@@ -128,7 +128,7 @@ public class SynthesizeSpeech : MonoBehaviour
 
 
         //google sdk
-        // print(s);
+         print(s);
         ssml = $" < speak >{s}</ speak > ";
 
         //print("start google : " + Time.time);
@@ -161,9 +161,9 @@ public class SynthesizeSpeech : MonoBehaviour
             else
             {
                 float timeaftertts = Time.time;
-                
-                GoogleSpeechResponse response = JsonUtility.FromJson<GoogleSpeechResponse>(www.downloadHandler.text);
 
+                GoogleSpeechResponse response = JsonUtility.FromJson<GoogleSpeechResponse>(www.downloadHandler.text);
+                print(Application.persistentDataPath);
                 File.WriteAllBytes(Application.persistentDataPath + "/somefile.mp3", Convert.FromBase64String(response.audioContent));
                 float timeafterttswritefile = Time.time;
 

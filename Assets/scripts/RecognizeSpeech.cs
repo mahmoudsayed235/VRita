@@ -182,65 +182,65 @@ public class RecognizeSpeech : MonoBehaviour
 
     public void configure()
     {
+        StartCoroutine(ConfigureCoroutine());
+    }
 
-        if (PlayerPrefs.GetString("Lang", "En") == "En")
-        {
-            language = languageEn;
-        }
-        else if (PlayerPrefs.GetString("Lang", "En") == "Sw")
-        {
-            language = languageSw;
-        }
-        else if (PlayerPrefs.GetString("Lang", "En") == "Sp")
-        {
-            language = languageSp;
-        }
-        {
-            // Continue with normal initialization, Text and Button objects are present.
+    private IEnumerator ConfigureCoroutine()
+    {
+        // Set language
+        string langPref = PlayerPrefs.GetString("Lang", "En");
+        if (langPref == "En") language = languageEn;
+        else if (langPref == "Sw") language = languageSw;
+        else if (langPref == "Sp") language = languageSp;
+
+        // Wait for microphone permission
 #if PLATFORM_ANDROID
-            // Request to use the microphone, cf.
-            // https://docs.unity3d.com/Manual/android-RequestingPermissions.html
-            message = "";
-            if (!Permission.HasUserAuthorizedPermission(Permission.Microphone))
+        if (!Permission.HasUserAuthorizedPermission(Permission.Microphone))
+        {
+            Permission.RequestUserPermission(Permission.Microphone);
+            // Wait until the user grants permission
+            while (!Permission.HasUserAuthorizedPermission(Permission.Microphone))
             {
-                Permission.RequestUserPermission(Permission.Microphone);
+                yield return null; // wait a frame
             }
+        }
 #elif PLATFORM_IOS
+        if (!Application.HasUserAuthorization(UserAuthorization.Microphone))
+        {
+            var request = Application.RequestUserAuthorization(UserAuthorization.Microphone);
+            while (!request.isDone)
+            {
+                yield return null; // wait a frame
+            }
             if (!Application.HasUserAuthorization(UserAuthorization.Microphone))
             {
-                Application.RequestUserAuthorization(UserAuthorization.Microphone);
+                Debug.LogError("Microphone permission denied");
+                yield break; // exit if user denies
             }
-#else
-            micPermissionGranted = true;
-            message = "";
-#endif
-            config = SpeechConfig.FromSubscription(LoadKeys.SPEECH_API_KEY, LoadKeys.SPEECH_API_REGION);
-
-            //language = "nb-NO";
-            config.SpeechRecognitionLanguage =language;
-
-            pushStream = AudioInputStream.CreatePushStream();
-            audioInput = AudioConfig.FromStreamInput(pushStream);
-            recognizer = new SpeechRecognizer(config, audioInput);
-
-
-            // recognizer = new SpeechRecognizer(config);
-
-
-            recognizer.Recognizing += RecognizingHandler;
-            recognizer.Recognized += RecognizedHandler;
-            recognizer.Canceled += CanceledHandler;
-
-
-            foreach (var device in Microphone.devices)
-            {
-                Debug.Log("DeviceName: " + device);
-            }
-            audioSource = GameObject.Find("MyAudioSource").GetComponent<AudioSource>();
-            startRecognition();
-            //   if(introControllerRecepit!=null)
-            // introControllerRecepit.enabled = true;
         }
+#endif
+
+        // Permission granted, continue initialization
+        pushStream = AudioInputStream.CreatePushStream();
+        audioInput = AudioConfig.FromStreamInput(pushStream);
+        config = SpeechConfig.FromSubscription(LoadKeys.SPEECH_API_KEY, LoadKeys.SPEECH_API_REGION);
+        config.SpeechRecognitionLanguage = language;
+
+        recognizer = new SpeechRecognizer(config, audioInput);
+
+        recognizer.Recognizing += RecognizingHandler;
+        recognizer.Recognized += RecognizedHandler;
+        recognizer.Canceled += CanceledHandler;
+
+        foreach (var device in Microphone.devices)
+        {
+            Debug.Log("DeviceName: " + device);
+        }
+
+        audioSource = GameObject.Find("MyAudioSource").GetComponent<AudioSource>();
+
+        // Start recognition
+        startRecognition();
     }
     void Start()
     {

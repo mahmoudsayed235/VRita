@@ -26,6 +26,11 @@ public class GeneratedText : MonoBehaviour
     public string promptSwiInterview;
     public string promptSpInterview;
 
+
+    public string promptEngDigitopia;
+    public string promptSwiDigitopia;
+    public string promptSpDigitopia;
+
     public string promptEngOral;
     public string promptSwiOral;
     public string promptSpOral;
@@ -58,7 +63,24 @@ public class GeneratedText : MonoBehaviour
             {
                 prompt = promptSpOral;
             }
-        }else if (PlayerPrefs.GetString("Type", "Oral") == "Interview")
+        }
+        else if (PlayerPrefs.GetString("Type", "Oral") == "Interview")
+        {
+            if (PlayerPrefs.GetString("Lang", "En") == "En")
+            {
+                prompt = promptEngInterview;
+            }
+            else if (PlayerPrefs.GetString("Lang", "En") == "Sw")
+            {
+                prompt = promptSwiInterview;
+            }
+            else if (PlayerPrefs.GetString("Lang", "En") == "Sp")
+            {
+                prompt = promptSpInterview;
+            }
+        }
+
+        else if (PlayerPrefs.GetString("Type", "Oral") == "Digitopia")
         {
             if (PlayerPrefs.GetString("Lang", "En") == "En")
             {
@@ -102,13 +124,11 @@ public class GeneratedText : MonoBehaviour
     List<Message> messages = new List<Message>();
     public async Task GetText(string playerInput, bool generate, string base_response)
     {
-        print("start generated : " + Time.time);
         string promptInput = "";
 
 
         promptInput = prompt + $"\n\n user: {playerInput} \n system: ";
-        print($"prompt input: {promptInput}");
-
+       
         if (generate)
         {
             openAiData openAIdata = new openAiData();
@@ -147,7 +167,6 @@ public class GeneratedText : MonoBehaviour
                 }
                 else
                 {
-                    print(www.downloadHandler.text);
                     openAiResponse openAIresponse = JsonUtility.FromJson<openAiResponse>(www.downloadHandler.text);
 
                     if (openAIresponse.choices.Length > 0)
@@ -157,7 +176,7 @@ public class GeneratedText : MonoBehaviour
                         promptInput += $"{openAIresponse.choices[0].message.content} \n";
                         response = openAIresponse.choices[0].message.content;
                         prompt = promptInput;
-                        print(response);
+                        
                        
 
                     }

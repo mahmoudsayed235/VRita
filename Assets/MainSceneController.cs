@@ -41,23 +41,45 @@ public class MainSceneController : MonoBehaviour
 
         }
     }
+    public GameObject topicContainer;
     public void changeSimulation()
     {
+        topicContainer.SetActive(true);
         if (dropdownType.value == 0)
         {
             PlayerPrefs.SetString("Type", "Oral");
+            index = 0;
 
         }
         else if (dropdownType.value == 1)
         {
             PlayerPrefs.SetString("Type", "Interview");
+            index = 1;
+
+        }
+        else if(dropdownType.value == 2)
+        {
+
+            topicContainer.SetActive(false);
+            PlayerPrefs.SetString("Type", "Digitopia");
+            index = 2;
 
         }
 
     }
+    int index = 0;
     public void StartScene()
     {
-        SceneManager.LoadScene(1);
+        if (index == 2)
+        {
+
+            SceneManager.LoadScene(2);
+        }
+        else
+        {
+
+            SceneManager.LoadScene(1);
+        }
         //TODO leave scene
     }
     public void changeLanguage()

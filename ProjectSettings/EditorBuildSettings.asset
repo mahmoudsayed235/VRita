@@ -11,5 +11,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Interview.unity
     guid: 10a37752398ba7140a864dc2f9eac584
+  - enabled: 1
+    path: Assets/Scenes/Digitopia.unity
+    guid: 9f48d999793bc1e41acf561b6e647563
   m_configObjects:
     Unity.XR.Oculus.Settings: {fileID: 11400000, guid: c290f9939859f3f448da1c9c9da2812f, type: 2}
+    com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 57c7f56168fef3b4994fdb09f1829698, type: 2}
+    com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 27deecf8550f18b49a71ad181928a7e3, type: 2}
+  m_UseUCBPForAssetBundles: 0
